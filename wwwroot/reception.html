@@ -118,10 +118,49 @@
         .row-full {
             grid-column: span 3;
         }
+
+        /* Viền đỏ cho ô nhập liệu bị lỗi */
+        .is-invalid {
+            border-color: #dc3545 !important;
+            background-color: #fff8f8;
+        }
+
+        /* Chữ thông báo lỗi nhỏ dưới ô */
+        .error-message {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 3px;
+            display: none; /* Mặc định ẩn */
+        }
+
+        /* Toast Notification (Thanh công cụ dưới màn hình) */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+            #toast.success {
+                background: var(--secondary);
+            }
+
+            #toast.error {
+                background: #dc3545;
+            }
     </style>
 </head>
 <body>
-
+    <div id="toast">Thông báo ở đây!</div>
     <div class="navbar">
         <div>
             <i class="fas fa-hospital-user"></i> <b>NHÂN ĐỨC HIS - PHÂN HỆ TIẾP TÂN</b>
@@ -147,6 +186,7 @@
                 <div class="form-group">
                     <label>Họ và tên *</label>
                     <input type="text" id="pFullName" placeholder="NGUYỄN VĂN A">
+                    <span id="nameError" class="error-message">Vui lòng nhập họ tên bệnh nhân!</span>
                 </div>
                 <div class="form-group">
                     <label>Ngày sinh</label>
@@ -222,9 +262,32 @@
             nav.prepend(adminBtn);
         }
 
+        // Hàm hiển thị thông báo Toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.className = type === 'success' ? 'toast-success' : 'toast-error';
+            toast.style.display = 'block';
+
+            // Tự động ẩn sau 3 giây
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Hàm lưu bệnh nhân chính
         async function savePatient() {
+            // 1. Lấy các phần tử giao diện
+            const nameInput = document.getElementById('pFullName');
+            const nameError = document.getElementById('nameError');
+
+            // 2. Reset trạng thái lỗi
+            nameInput.classList.remove('is-invalid');
+            nameError.style.display = 'none';
+
+            // 3. Thu thập dữ liệu
             const patientData = {
-                fullName: document.getElementById('pFullName').value,
+                fullName: nameInput.value.trim(),
                 birthday: document.getElementById('pBirthday').value || null,
                 gender: document.getElementById('pGender').value,
                 phone: document.getElementById('pPhone').value,
@@ -238,11 +301,15 @@
                 status: "Chờ khám"
             };
 
+            // 4. KIỂM TRA LỖI (Validation)
             if (!patientData.fullName) {
-                alert("Vui lòng nhập tên bệnh nhân!");
-                return;
+                nameInput.classList.add('is-invalid'); // Hiện viền đỏ ô input
+                nameError.style.display = 'block';      // Hiện dòng chữ báo lỗi
+                nameInput.focus();                     // Đưa con trỏ chuột vào ô lỗi
+                return;                                // Dừng lại, không gửi dữ liệu
             }
 
+            // 5. GỬI DỮ LIỆU ĐI (Fetch API)
             try {
                 const response = await fetch('/api/Patients', {
                     method: 'POST',
@@ -251,14 +318,17 @@
                 });
 
                 if (response.ok) {
-                    alert("Tiếp nhận bệnh nhân thành công!");
-                    location.reload();
+                    showToast("✅ Đã tiếp nhận bệnh nhân thành công!", "success");
+                    // Đợi 1.5 giây để người dùng thấy thông báo rồi mới làm mới trang
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
                 } else {
-                    alert("Lỗi khi lưu bệnh nhân!");
+                    showToast("❌ Lỗi: Không thể lưu dữ liệu vào hệ thống!", "error");
                 }
             } catch (err) {
-                console.error(err);
-                alert("Không thể kết nối đến máy chủ!");
+                console.error("Lỗi kết nối:", err);
+                showToast("⚠️ Lỗi kết nối đến máy chủ!", "error");
             }
         }
 
