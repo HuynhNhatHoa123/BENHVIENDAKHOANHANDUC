@@ -1,0 +1,6 @@
+@BENHVIENDAKHOANHANDUC_HostAddress = http://localhost:5261
+
+GET {{BENHVIENDAKHOANHANDUC_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

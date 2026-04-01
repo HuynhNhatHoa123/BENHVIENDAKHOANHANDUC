@@ -1,0 +1,414 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập | Hệ thống Bệnh viện Nhân Đức</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #007bff;
+            --primary-dark: #0056b3;
+            --secondary: #28a745;
+            --text-main: #2d3436;
+            --text-sub: #636e72;
+            --white: #ffffff;
+            --gradient: linear-gradient(135deg, #007bff 0%, #00d2ff 100%);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Quicksand', sans-serif;
+            background: #f4f7f6;
+            background-image: radial-gradient(#d1d1d1 0.5px, transparent 0.5px);
+            background-size: 20px 20px; /* Tạo chấm nhẹ nền */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            background: var(--white);
+            width: 950px;
+            height: 580px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        }
+
+        /* PHẦN TRÁI: HÌNH ẢNH */
+        .image-section {
+            flex: 1.2;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+            .image-section h1 {
+                font-size: 2.5rem;
+                font-weight: 700;
+                margin-bottom: 10px;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            }
+
+            .image-section p {
+                font-size: 1.1rem;
+                opacity: 0.9;
+                letter-spacing: 1px;
+            }
+
+        .overlay-badge {
+            position: absolute;
+            bottom: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* PHẦN PHẢI: FORM */
+        .login-section {
+            flex: 1;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #fff;
+        }
+
+            .login-section h2 {
+                color: var(--text-main);
+                font-size: 2rem;
+                font-weight: 700;
+                margin-bottom: 10px;
+            }
+
+        .subtitle {
+            color: var(--text-sub);
+            margin-bottom: 35px;
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            margin-bottom: 22px;
+            position: relative;
+        }
+
+            .input-group label {
+                display: block;
+                margin-bottom: 8px;
+                color: var(--text-main);
+                font-weight: 600;
+                font-size: 0.9rem;
+            }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+            .input-wrapper i {
+                position: absolute;
+                left: 15px;
+                color: var(--text-sub);
+                transition: 0.3s;
+            }
+
+        input {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border: 2px solid #f1f3f5;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f8f9fa;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+            input:focus {
+                border-color: var(--primary);
+                background: #fff;
+                box-shadow: 0 5px 15px rgba(0,123,255,0.1);
+            }
+
+                input:focus + i {
+                    color: var(--primary);
+                }
+
+        button.btn-login {
+            width: 100%;
+            padding: 15px;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,123,255,0.2);
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+            button.btn-login:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 15px 25px rgba(0,123,255,0.3);
+            }
+
+            button.btn-login:active {
+                transform: translateY(-1px);
+            }
+
+        #message {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* MODAL CHỌN QUYỀN - NÂNG CẤP */
+        #roleModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(45, 52, 54, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .role-card {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            transform: scale(1);
+            animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popUp {
+            from {
+                transform: scale(0.8);
+            }
+
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .role-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .role-btn {
+            background: #fff;
+            color: var(--text-main);
+            border: 2px solid #f1f3f5;
+            margin-top: 12px;
+            padding: 18px;
+            border-radius: 15px;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+            .role-btn:hover {
+                background: var(--primary);
+                color: white;
+                border-color: var(--primary);
+                transform: translateX(5px);
+            }
+
+            .role-btn i {
+                font-size: 1.2rem;
+            }
+
+        /* Responsive cho màn hình nhỏ */
+        @media (max-width: 900px) {
+            .container {
+                width: 95%;
+                height: auto;
+                flex-direction: column;
+            }
+
+            .image-section {
+                padding: 60px 20px;
+            }
+
+            .login-section {
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="image-section">
+            <h1>NHÂN ĐỨC</h1>
+            <p>Hệ Thống Quản Trị Bệnh Viện Thông Minh</p>
+            <div class="overlay-badge">
+                <i class="fas fa-shield-alt"></i> Bảo mật & Tin cậy
+            </div>
+        </div>
+
+        <div class="login-section">
+            <h2>Chào mừng!</h2>
+            <p class="subtitle">Vui lòng đăng nhập để bắt đầu phiên làm việc.</p>
+
+            <div class="input-group">
+                <label>Tài khoản</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" placeholder="Tên đăng nhập">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Mật khẩu</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="••••••••">
+                </div>
+            </div>
+
+            <button class="btn-login" onclick="handleLogin()">
+                <i class="fas fa-sign-in-alt"></i> VÀO HỆ THỐNG
+            </button>
+
+            <p id="message"></p>
+        </div>
+    </div>
+
+    <div id="roleModal">
+        <div class="role-card">
+            <i class="fas fa-user-circle" style="font-size: 4rem; color: var(--primary); margin-bottom: 20px;"></i>
+            <h3>Chọn vai trò</h3>
+            <p style="color: var(--text-sub); font-size: 0.95rem; margin-bottom: 25px;">
+                Tài khoản này có nhiều quyền hạn. Hãy chọn khu vực bạn muốn làm việc:
+            </p>
+            <div id="roleList"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- GIỮ NGUYÊN LOGIC JAVASCRIPT CỦA BẠN ---
+        let cachedUserData = null;
+
+        async function handleLogin() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const msg = document.getElementById('message');
+
+            msg.style.color = "#333";
+            msg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xác thực...';
+
+            try {
+                const response = await fetch('/api/Auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, password: pass })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    cachedUserData = data;
+                    if (data.roles.length === 0) {
+                        msg.style.color = "#e74c3c";
+                        msg.innerText = "Tài khoản chưa được cấp quyền!";
+                    }
+                    else if (data.roles.length === 1) {
+                        selectRoleAndRedirect(data.roles[0].name);
+                    }
+                    else {
+                        showRoleModal(data.roles);
+                    }
+                } else {
+                    msg.style.color = "#e74c3c";
+                    msg.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${data.message || "Sai tài khoản hoặc mật khẩu!"}`;
+                }
+            } catch (error) {
+                msg.style.color = "#e74c3c";
+                msg.innerText = "Lỗi kết nối máy chủ!";
+            }
+        }
+
+        function showRoleModal(roles) {
+            const roleList = document.getElementById('roleList');
+            roleList.innerHTML = '';
+
+            // Icon tương ứng cho từng vai trò
+            const icons = {
+                'Admin': 'fa-user-shield',
+                'Doctor': 'fa-user-md',
+                'Receptionist': 'fa-concierge-bell',
+                'Staff': 'fa-user-nurse'
+            };
+
+            roles.forEach(role => {
+                const iconClass = icons[role.name] || 'fa-user-tag';
+                const btn = document.createElement('button');
+                btn.className = 'role-btn';
+                btn.innerHTML = `<i class="fas ${iconClass}"></i> <span>${role.name}</span>`;
+                btn.onclick = () => selectRoleAndRedirect(role.name);
+                roleList.appendChild(btn);
+            });
+            document.getElementById('roleModal').style.display = 'flex';
+        }
+
+        function selectRoleAndRedirect(roleName) {
+            const userSession = { ...cachedUserData, selectedRole: roleName };
+            localStorage.setItem('user', JSON.stringify(userSession));
+
+            if (roleName === 'Admin') window.location.href = 'admin.html';
+            else if (roleName === 'Doctor') window.location.href = 'doctor.html';
+            else if (roleName === 'Receptionist') window.location.href = 'reception.html';
+            else if (roleName === 'Staff') window.location.href = 'reception.html';
+            else alert("Chưa cấu hình điều hướng cho quyền: " + roleName);
+        }
+    </script>
+</body>
+</html>
